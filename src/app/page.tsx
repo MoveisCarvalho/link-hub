@@ -51,11 +51,9 @@ function PublicContent() {
 
         {loading ? (
           <p className="text-slate-400">Carregando...</p>
-        ) : links.length === 0 ? (
-          <p className="text-slate-400">Nenhum link cadastrado no momento.</p>
         ) : (
           <div className="flex flex-col gap-4">
-            {/* Card de Destaque Fixo no Topo */}
+            {/* Card de Destaque Fixo no Topo (se houver parâmetro) */}
             {featuredLink && (
               <div className="mb-2">
                 <div className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1 text-left flex items-center gap-1">
@@ -78,7 +76,30 @@ function PublicContent() {
               </div>
             )}
 
-            {/* Demais Links */}
+            {/* Card Fixo do Catálogo Geral / Principal */}
+            <div className="mb-2">
+              <a
+                href="https://primeiramao.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 p-5 rounded-2xl transition shadow-xl text-left block group relative overflow-hidden border border-emerald-400/40"
+              >
+                <div className="absolute top-0 right-0 bg-amber-400 text-slate-950 text-[10px] font-extrabold px-2 py-0.5 rounded-bl-lg shadow">
+                  🔥 TUDO EM UM SÓ LUGAR
+                </div>
+                <h2 className="text-xl font-black text-white group-hover:underline mb-1 flex items-center gap-2">
+                  ✨ Catálogo Geral de Ofertas
+                </h2>
+                <p className="text-sm text-emerald-100 mb-4">
+                  Explore nosso catálogo principal completo com todas as oportunidades e novidades selecionadas para você!
+                </p>
+                <span className="inline-flex items-center justify-center w-full bg-white text-emerald-950 font-bold py-2.5 px-4 rounded-xl shadow-md group-hover:bg-emerald-50 transition text-sm">
+                  Acessar Catálogo Completo 🚀
+                </span>
+              </a>
+            </div>
+
+            {/* Demais Links Cadastrados */}
             {otherLinks.map((link) => (
               <a
                 key={link._id}
