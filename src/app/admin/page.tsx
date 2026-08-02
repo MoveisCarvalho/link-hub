@@ -23,8 +23,17 @@ export default function AdminPage() {
     const [editId, setEditId] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
-    // Verificar se já está logado na sessão ao carregar a página
+    // Estados para o Gerador de Link de Destaque
+    const [activeShareId, setActiveShareId] = useState<string | null>(null);
+    const [copiedId, setCopiedId] = useState<string | null>(null);
+    const [origin, setOrigin] = useState('');
+
+    // Capturar a URL base do site (para gerar o link correto) e verificar sessão
     useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setOrigin(window.location.origin);
+        }
+
         const logged = sessionStorage.getItem('admin_logged');
         if (logged === 'true') {
             setIsAuthenticated(true);
@@ -109,6 +118,12 @@ export default function AdminPage() {
         }
     };
 
+    const handleCopy = (shareUrl: string, id: string) => {
+        navigator.clipboard.writeText(shareUrl);
+        setCopiedId(id);
+        setTimeout(() => setCopiedId(null), 2000);
+    };
+
     // Se não estiver autenticado, exibe a tela de Login
     if (!isAuthenticated) {
         return (
@@ -164,7 +179,7 @@ export default function AdminPage() {
         );
     }
 
-    // Painel Administrativo Completo (CRUD)
+    // Painel Administrativo Completo com Gerador de Links de Destaque
     return (
         <main className="min-h-screen bg-slate-900 text-slate-100 py-10 px-4">
             <div className="max-w-2xl mx-auto">
@@ -237,23 +252,69 @@ export default function AdminPage() {
                 </form>
 
                 <div className="flex flex-col gap-4">
-                    <h2 className="text-lg font-semibold">Links Cadastrados</h2>
+                    <h2 className="text-lg font-semibold">Links Cadastrados & Gerador de Destaque</h2>
                     {links.length === 0 ? (
                         <p className="text-sm text-slate-500">Nenhum link cadastrado ainda.</p>
                     ) : (
-                        links.map((link) => (
-                            <div key={link._id} className="bg-slate-800 p-4 rounded-xl border border-slate-700 flex justify-between items-center shadow">
-                                <div>
-                                    <h3 className="font-bold text-sky-400">{link.title}</h3>
-                                    <p className="text-sm text-slate-300">{link.description}</p>
-                                    <a href={link.url} target="_blank" rel="noreferrer" className="text-xs text-slate-500 truncate block max-w-xs hover:underline mt-1">{link.url}</a>
+                        links.map((link) => {
+                            const shareUrl = `${origin}/?destaque=${encodeURIComponent(link.title)}`;
+                            const isSharing = activeShareId === link._id;
+
+                            return (
+                                <div key={link._id} className="bg-slate-800 p-4 rounded-xl border border-slate-700 flex flex-col gap-3 shadow">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <h3 className="font-bold text-sky-400">{link.title}</h3>
+                                            <p className="text-sm text-slate-300">{link.description}</p>
+                                            <a href={link.url} target="_blank" rel="noreferrer" className="text-xs text-slate-500 truncate block max-w-xs hover:underline mt-1">{link.url}</a>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button onClick={() => handleEdit(link)} className="bg-amber-600 hover:bg-amber-500 text-xs py-1.5 px-3 rounded-lg text-white font-medium transition">Editar</button>
+                                            <button onClick={() => handleDelete(link._id)} className="bg-rose-600 hover:bg-rose-500 text-xs py-1.5 px-3 rounded-lg text-white font-medium transition">Excluir</button>
+                                        </div>
+                                    </div>
+
+                                    {/* Botão de Destaque / Gerar URL Personalizada */}
+                                    <div className="pt-2 border-t border-slate-700/60 flex items-center justify-between">
+                                        <button
+                                            onClick={() => setActiveShareId(isSharing ? null : link._id)}
+                                            className="text-xs text-amber-400 hover:text-amber-300 flex items-center gap-1.5 font-medium bg-amber-500/10 hover:bg-amber-500/20 px-3 py-1.5 rounded-lg transition border border-amber-500/30"
+                                        >
+                                            ⭐ {isSharing ? 'Ocultar Link de Destaque' : 'Gerar Link com este Card em Destaque'}
+                                        </button>
+                                    </div>
+
+                                    {/* Caixa expansível com a URL gerada, botão Copiar e Abrir */}
+                                    {isSharing && (
+                                        <div className="bg-slate-900 p-3 rounded-xl border border-slate-700 flex flex-col gap-2 mt-1">
+                                            <span className="text-[11px] text-slate-400 font-medium">URL personalizada para enviar ao cliente (deixa este card fixo no topo):</span>
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="text"
+                                                    readOnly
+                                                    value={shareUrl}
+                                                    className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-slate-300 font-mono select-all"
+                                                />
+                                                <button
+                                                    onClick={() => handleCopy(shareUrl, link._id)}
+                                                    className="bg-sky-600 hover:bg-sky-500 text-white text-xs px-3 py-2 rounded-lg transition font-medium whitespace-nowrap shadow"
+                                                >
+                                                    {copiedId === link._id ? 'Copiado! ✓' : 'Copiar'}
+                                                </button>
+                                                <a
+                                                    href={shareUrl}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="bg-slate-700 hover:bg-slate-600 text-white text-xs px-3 py-2 rounded-lg transition font-medium whitespace-nowrap shadow"
+                                                >
+                                                    Abrir ↗
+                                                </a>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
-                                <div className="flex gap-2">
-                                    <button onClick={() => handleEdit(link)} className="bg-amber-600 hover:bg-amber-500 text-xs py-1.5 px-3 rounded-lg text-white font-medium transition">Editar</button>
-                                    <button onClick={() => handleDelete(link._id)} className="bg-rose-600 hover:bg-rose-500 text-xs py-1.5 px-3 rounded-lg text-white font-medium transition">Excluir</button>
-                                </div>
-                            </div>
-                        ))
+                            );
+                        })
                     )}
                 </div>
             </div>
