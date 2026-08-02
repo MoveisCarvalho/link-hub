@@ -39,9 +39,8 @@ function PublicContent() {
     ? links.find(l => l.title.toLowerCase().includes(normalizedHighlight))
     : null;
 
-  const otherLinks = featuredLink
-    ? links.filter(l => l._id !== featuredLink._id)
-    : links;
+  // Se houver parâmetro de destaque, mostra apenas o destaque e o catálogo geral
+  const otherLinks = normalizedHighlight ? [] : links;
 
   return (
     <main className="min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center py-12 px-4">
@@ -53,21 +52,24 @@ function PublicContent() {
           <p className="text-slate-400">Carregando...</p>
         ) : (
           <div className="flex flex-col gap-4">
-            {/* Card de Destaque Fixo no Topo (se houver parâmetro) */}
+            {/* Card de Destaque Fixo no Topo (se houver parâmetro e for encontrado) */}
             {featuredLink && (
               <div className="mb-2">
-                <div className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1 text-left flex items-center gap-1">
+                <div className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-1 text-center flex items-center justify-center gap-1">
                   ⭐ Em Destaque
                 </div>
                 <a
                   href={featuredLink.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-gradient-to-r from-sky-950 to-slate-800 hover:from-sky-900 hover:to-slate-700 border-2 border-sky-500 p-5 rounded-2xl transition shadow-2xl text-left block group relative overflow-hidden"
+                  className="bg-gradient-to-r from-sky-950 to-slate-800 hover:from-sky-900 hover:to-slate-700 border-2 border-sky-500 p-5 rounded-2xl transition shadow-2xl text-center block group relative overflow-hidden"
                 >
                   <div className="absolute top-0 right-0 bg-sky-500 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded-bl-lg">
                     PRINCIPAL
                   </div>
+                  <span className="text-[11px] font-bold text-sky-400 tracking-wide block mb-1 text-center">
+                    👉 Toque no card para ver as ofertas exclusivas
+                  </span>
                   <h2 className="text-xl font-extrabold text-sky-300 group-hover:underline mb-1">
                     {featuredLink.title}
                   </h2>
@@ -82,12 +84,15 @@ function PublicContent() {
                 href="https://primeiramao.vercel.app/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 p-5 rounded-2xl transition shadow-xl text-left block group relative overflow-hidden border border-emerald-400/40"
+                className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 p-5 rounded-2xl transition shadow-xl text-center block group relative overflow-hidden border border-emerald-400/40"
               >
                 <div className="absolute top-0 right-0 bg-amber-400 text-slate-950 text-[10px] font-extrabold px-2 py-0.5 rounded-bl-lg shadow">
                   🔥 TUDO EM UM SÓ LUGAR
                 </div>
-                <h2 className="text-xl font-black text-white group-hover:underline mb-1 flex items-center gap-2">
+                <span className="text-[11px] font-bold text-emerald-100 tracking-wide block mb-1 text-center">
+                  👉 Toque no card para explorar todas as ofertas
+                </span>
+                <h2 className="text-xl font-black text-white group-hover:underline mb-1 flex items-center justify-center gap-2">
                   ✨ Catálogo Geral de Ofertas
                 </h2>
                 <p className="text-sm text-emerald-100 mb-4">
@@ -99,15 +104,18 @@ function PublicContent() {
               </a>
             </div>
 
-            {/* Demais Links Cadastrados */}
+            {/* Demais Links Cadastrados (Ocultados automaticamente se houver parâmetro de destaque) */}
             {otherLinks.map((link) => (
               <a
                 key={link._id}
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-slate-800 hover:bg-slate-700 border border-slate-700 p-4 rounded-xl transition shadow-lg text-left block group"
+                className="bg-slate-800 hover:bg-slate-700 border border-slate-700 p-4 rounded-xl transition shadow-lg text-center block group"
               >
+                <span className="text-[10px] font-semibold text-slate-400 tracking-wider block mb-1 text-center">
+                  👉 Toque para acessar as ofertas
+                </span>
                 <h2 className="text-lg font-semibold text-sky-400 group-hover:underline mb-1">
                   {link.title}
                 </h2>
